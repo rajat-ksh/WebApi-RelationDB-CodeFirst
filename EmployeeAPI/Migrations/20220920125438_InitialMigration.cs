@@ -13,12 +13,13 @@ namespace EmployeeAPI.Migrations
                 name: "Departments",
                 columns: table => new
                 {
-                    DeptId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DeptName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Departments", x => x.DeptId);
+                    table.PrimaryKey("PK_Departments", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -55,17 +56,17 @@ namespace EmployeeAPI.Migrations
                 name: "WorkLocation",
                 columns: table => new
                 {
-                    LocationId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LocationName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkLocation", x => x.LocationId);
+                    table.PrimaryKey("PK_WorkLocation", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Employees",
+                name: "Employee",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -73,47 +74,48 @@ namespace EmployeeAPI.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DepartmentDeptId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     ManagerId = table.Column<int>(type: "int", nullable: false),
-                    WorkLocationLocationId = table.Column<int>(type: "int", nullable: false)
+                    DeptId = table.Column<int>(type: "int", nullable: false),
+                    LocationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employees", x => x.Id);
+                    table.PrimaryKey("PK_Employee", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Employees_Departments_DepartmentDeptId",
-                        column: x => x.DepartmentDeptId,
+                        name: "FK_Employee_Departments_DeptId",
+                        column: x => x.DeptId,
                         principalTable: "Departments",
-                        principalColumn: "DeptId");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Employees_WorkLocation_WorkLocationLocationId",
-                        column: x => x.WorkLocationLocationId,
+                        name: "FK_Employee_WorkLocation_LocationId",
+                        column: x => x.LocationId,
                         principalTable: "WorkLocation",
-                        principalColumn: "LocationId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employees_DepartmentDeptId",
-                table: "Employees",
-                column: "DepartmentDeptId");
+                name: "IX_Employee_DeptId",
+                table: "Employee",
+                column: "DeptId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employees_WorkLocationLocationId",
-                table: "Employees",
-                column: "WorkLocationLocationId");
+                name: "IX_Employee_LocationId",
+                table: "Employee",
+                column: "LocationId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Employee");
+
+            migrationBuilder.DropTable(
                 name: "EmployeeEducation");
 
             migrationBuilder.DropTable(
                 name: "EmployeePersonal");
-
-            migrationBuilder.DropTable(
-                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "Departments");

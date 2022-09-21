@@ -4,6 +4,7 @@ using EmployeeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EmployeeAPI.Migrations
 {
     [DbContext(typeof(EmployeeAPIDbContext))]
-    partial class EmployeesAPIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220920125438_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +47,7 @@ namespace EmployeeAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("DepartmentId")
+                    b.Property<int>("DeptId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -63,17 +65,17 @@ namespace EmployeeAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ManagerId")
+                    b.Property<int>("LocationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WorkLocationId")
+                    b.Property<int>("ManagerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DepartmentId");
+                    b.HasIndex("DeptId");
 
-                    b.HasIndex("WorkLocationId");
+                    b.HasIndex("LocationId");
 
                     b.ToTable("Employee");
                 });
@@ -149,20 +151,30 @@ namespace EmployeeAPI.Migrations
             modelBuilder.Entity("EmployeeAPI.Models.DataViewModel.Employee", b =>
                 {
                     b.HasOne("EmployeeAPI.Models.DataViewModel.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
+                        .WithMany("employee")
+                        .HasForeignKey("DeptId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EmployeeAPI.Models.DataViewModel.WorkLocation", "WorkLocation")
-                        .WithMany()
-                        .HasForeignKey("WorkLocationId")
+                        .WithMany("employee")
+                        .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Department");
 
                     b.Navigation("WorkLocation");
+                });
+
+            modelBuilder.Entity("EmployeeAPI.Models.DataViewModel.Department", b =>
+                {
+                    b.Navigation("employee");
+                });
+
+            modelBuilder.Entity("EmployeeAPI.Models.DataViewModel.WorkLocation", b =>
+                {
+                    b.Navigation("employee");
                 });
 #pragma warning restore 612, 618
         }

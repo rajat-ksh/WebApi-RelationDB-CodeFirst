@@ -1,5 +1,4 @@
 ﻿using EmployeeAPI.Data;
-using EmployeeAPI.Models.AuthenticationModel;
 using EmployeeAPI.Models.DataViewModel;
 using EmployeeAPI.Models.RequestModel;
 using EmployeeAPI.Repository;
@@ -16,21 +15,16 @@ namespace EmployeeAPI.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly EmployeeRepository<Employee> _employeeRepository;
-        private readonly EmployeeRepository<EmployeePersonalDetails> _employeePersonalRepository;
+        private readonly EmployeePersonalRepository<EmployeePersonalDetails> _employeePersonalRepository;
         private readonly EmployeeEducationRepository<EmployeeEducationDetails> _employeeEducationRepository;
 
-        private readonly IJWTManagerRepository _jWTManager;
-
-
-        public EmployeeController(EmployeeAPIDbContext dbContext, IJWTManagerRepository jWTManager)
+        public EmployeeController(EmployeeAPIDbContext dbContext)
         {
             _employeeRepository = new EmployeeRepository<Employee>(dbContext);
-            _employeePersonalRepository = new EmployeeRepository<EmployeePersonalDetails>(dbContext);
+            _employeePersonalRepository = new EmployeePersonalRepository<EmployeePersonalDetails>(dbContext);
             _employeeEducationRepository = new EmployeeEducationRepository<EmployeeEducationDetails>(dbContext);
-            _jWTManager = jWTManager;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllEmployee()
         {
@@ -57,7 +51,7 @@ namespace EmployeeAPI.Controllers
             EmployeePersonalDetails personalDetails = PreparePersonalDetails(addEmployeeRequest, guid);
             EmployeeEducationDetails educationDetails = PrepareEducationDetail(addEmployeeRequest, guid);
 
-            //await _employeeRepository.Add(employee);
+            await _employeeRepository.Add(employee);
             await _employeePersonalRepository.Add(personalDetails);
             await _employeeEducationRepository.Add(educationDetails);
             return Ok(employee);
@@ -88,21 +82,6 @@ namespace EmployeeAPI.Controllers
             return isEmployeeDeleted ? Ok() : NotFound();
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("authenticate")]
-        public IActionResult Authenticate(User usersdata)
-        {
-            var token = _jWTManager.Authenticate(usersdata);
-
-            if (token == null)
-            {
-                return Unauthorized();
-            }
-
-            return Ok(token);
-        }
-
         static Employee PrepareEmployee(EmployeeAddRequestDto addEmployeeRequest, Guid guid)
         {
             return new Employee()
@@ -113,17 +92,11 @@ namespace EmployeeAPI.Controllers
                 LastName = addEmployeeRequest.LastName,
                 Email = addEmployeeRequest.Email,
                 ManagerId = addEmployeeRequest.ManagerId,
-                WorkLocation = new WorkLocation()
-                {
-                    Id = addEmployeeRequest.WorkLocationId
-                },
-                Department = new Department()
-                {
-                    Id = addEmployeeRequest.DepartmentId
-                }
-
+                DeptId = addEmployeeRequest.DepartmentId,
+                LocationId=addEmployeeRequest.WorkLocationId
             };
         }
+
         static EmployeePersonalDetails PreparePersonalDetails(EmployeeAddRequestDto addEmployeeRequest, Guid guid)
         {
             return new EmployeePersonalDetails()
@@ -134,6 +107,7 @@ namespace EmployeeAPI.Controllers
                 State = addEmployeeRequest.State
             };
         }
+
         static EmployeeEducationDetails PrepareEducationDetail(EmployeeAddRequestDto addEmployeeRequest, Guid guid)
         {
             return new EmployeeEducationDetails()

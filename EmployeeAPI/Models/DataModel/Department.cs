@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EmployeeAPI.Models.DataViewModel
 {
-    public class Department : BaseModel
+    public class Department:BaseModel
     {
     }
 }

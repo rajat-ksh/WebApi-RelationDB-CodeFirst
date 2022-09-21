@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using WebApi.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,18 +26,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
-{
-    // global cors policy
-    app.UseCors(x => x
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader());
-
-    // custom jwt auth middleware
-    app.UseMiddleware<JwtMiddleware>();
-
-    app.MapControllers();
 }
 
 app.UseHttpsRedirection();

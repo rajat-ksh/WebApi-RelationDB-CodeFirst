@@ -12,8 +12,16 @@ namespace EmployeeAPI.Models.DataViewModel
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public Department Department { get; set; }
         public int ManagerId { get; set; }
+
+        //navigation Properties
+        public int DeptId { get; set; }
+
+        [ForeignKey("DeptId")]
+        public Department Department { get; set; }
+        public int LocationId { get; set; }
+
+        [ForeignKey("LocationId")]
         public WorkLocation WorkLocation { get; set; }
     }
 }
